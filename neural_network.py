@@ -1,20 +1,15 @@
 from sklearn import neural_network
-from data_service import load_and_split_data
-from accuracy_report_service import report_accuracy
-from predict_service import predict
+from learner import Learner
 
-accuracy_sum = 0
-num_runs = 10
-for i in range(num_runs):
 
-    X_train, X_test, Y_train, Y_test = load_and_split_data()
+class NNLearner(Learner):
 
-    #mlp_classifier = neural_network.MLPClassifier(hidden_layer_sizes=(64,64))
-    mlp_classifier = neural_network.MLPClassifier(solver='lbfgs', alpha=1e-5, random_state=77)
+    def fit_predict_score(self, x_train, y_train, x_test, y_test):
 
-    prediction = predict(mlp_classifier, X_train, Y_train, X_test)
+        # mlp_classifier = neural_network.MLPClassifier(hidden_layer_sizes=(64,64))
+        mlp_classifier = neural_network.MLPClassifier(solver='lbfgs', alpha=1e-5, random_state=1)
 
-    accuracy = report_accuracy(Y_test, prediction)
-    accuracy_sum += accuracy
+        return super(NNLearner, self).fit_predict_score(mlp_classifier, x_train, y_train, x_test, y_test)
 
-print("Mean accuracy: {0}".format(accuracy_sum/float(num_runs)))
+
+

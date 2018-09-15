@@ -1,20 +1,11 @@
 from sklearn import svm
-from data_service import load_and_split_data
-from accuracy_report_service import report_accuracy
-from predict_service import predict
+from learner import Learner
 
-accuracy_sum = 0
-num_runs = 10
-for i in range(num_runs):
 
-    X_train, X_test, Y_train, Y_test = load_and_split_data()
+class SVMLearner(Learner):
 
-    #mlp_classifier = neural_network.MLPClassifier(hidden_layer_sizes=(64,64))
-    mlp_classifier = svm.LinearSVC(random_state=77)
+    def fit_predict_score(self, x_train, y_train, x_test, y_test):
 
-    prediction = predict(mlp_classifier, X_train, Y_train, X_test)
+        svm_classifier = svm.LinearSVC(random_state=2)
 
-    accuracy = report_accuracy(Y_test, prediction)
-    accuracy_sum += accuracy
-
-print("Mean accuracy: {0}".format(accuracy_sum/float(num_runs)))
+        return super(SVMLearner, self).fit_predict_score(svm_classifier, x_train, y_train, x_test, y_test)
