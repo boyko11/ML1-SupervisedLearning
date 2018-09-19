@@ -21,7 +21,7 @@ shuffled_indices = np.random.choice(Y.shape[0], Y.shape[0], replace=False)
 X_shuffled = X[shuffled_indices, :]
 Y_shuffled = Y[shuffled_indices]
 
-ylim = (0.2, 1.01)
+ylim = (0.0, 0.65)
 train_sizes =  np.linspace(.1, 1.0, 10)
 
 plot_learning_curve(estimator=dt_learner.estimator, title='DT Learning Curve', X=X_shuffled, y=Y_shuffled, ylim=ylim,
