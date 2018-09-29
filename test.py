@@ -13,3 +13,6 @@ print(np.array([.8]))
 #
 # for i in range(5, max_number_iter, iter_step):
 #     print(i)
+
+
+print(np.random.choice(5, 3, replace=False))

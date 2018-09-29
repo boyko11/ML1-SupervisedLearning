@@ -8,7 +8,7 @@ class KNNLearner(Learner):
 
         self.n_neighbors = n_neighbors
         self.weights = weights
-        self.estimator = neighbors.KNeighborsClassifier(self.n_neighbors, self.weights)
+        self.estimator = neighbors.KNeighborsClassifier(n_neighbors=self.n_neighbors, weights=self.weights)
 
     def fit_predict_score(self, x_train, y_train, x_test, y_test):
 
