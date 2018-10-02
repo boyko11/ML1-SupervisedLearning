@@ -12,6 +12,7 @@ class Learner:
 
         start_prediction_time = time.time()
         prediction = learned_model.predict(x_test)
+        print('prediction: ', prediction[:10] )
         predicion_time = time.time() - start_prediction_time
         #print(accuracy_score(y_test, prediction), learner.score(x_test, y_test))
 
