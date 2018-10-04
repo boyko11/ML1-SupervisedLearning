@@ -1,5 +1,6 @@
 from sklearn import tree
 from learner import Learner
+import numpy as np
 
 
 class DTLearner(Learner):
@@ -10,6 +11,8 @@ class DTLearner(Learner):
 
     def fit_predict_score(self, x_train, y_train, x_test, y_test):
 
+        print(np.unique(y_train))
+        print(np.unique(y_test))
         return super(DTLearner, self).fit_predict_score(self.estimator, x_train, y_train, x_test, y_test)
 
     def draw_tree(self):

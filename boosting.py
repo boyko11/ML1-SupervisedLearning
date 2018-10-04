@@ -5,10 +5,12 @@ from sklearn import tree
 
 class BoostingLearner(Learner):
 
-    def __init__(self):
+    def __init__(self, max_depth=1):
+
+        self.max_depth = max_depth
         #self.estimator = ensemble.GradientBoostingClassifier()
-        # self.estimator = ensemble.AdaBoostClassifier(tree.DecisionTreeClassifier(max_depth=1))
-        self.estimator = ensemble.AdaBoostClassifier()
+        self.estimator = ensemble.AdaBoostClassifier(tree.DecisionTreeClassifier(max_depth=self.max_depth))
+        #self.estimator = ensemble.AdaBoostClassifier()
 
     def fit_predict_score(self, x_train, y_train, x_test, y_test):
 
