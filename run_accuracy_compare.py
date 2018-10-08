@@ -59,7 +59,7 @@ dt_fit_times, svm_fit_times, nn_fit_times, knn_fit_times, boosting_fit_times = [
 dt_predict_times, svm_predict_times, nn_predict_times, knn_predict_times, boosting_predict_times = [], [], [], [], []
 
 num_runs = 1
-scale_data = True
+scale_data = False
 transform_data = False
 random_slice = None
 random_seed = 123456789
@@ -98,7 +98,7 @@ for i in range(num_runs):
     print('nn: {0}, {1}, {2}'.format(nn_accuracy_score, nn_fit_time, nn_predict_time))
     stats_service.record_stats(nn_accuracy_scores, nn_accuracy_score, nn_fit_times, nn_fit_time, nn_predict_times,
                                nn_predict_time)
-    #
+
     # svm_accuracy_score, svm_fit_time, svm_predict_time = svm_learner.fit_predict_score(x_train, y_train, x_test, y_test)
     # print('svm: {0}, {1}, {2}'.format(svm_accuracy_score, svm_fit_time, svm_predict_time))
     # stats_service.record_stats(svm_accuracy_scores, svm_accuracy_score, svm_fit_times, svm_fit_time, svm_predict_times,

@@ -63,7 +63,6 @@ for i in range(1, max_number_iter, iter_step):
 
     print(i)
     # svm_learner = SVMLearner(max_iter=i)
-    nn_learner = NNLearner(max_iter=i)
 
     nn_hidden_layer_sizes = (100,)
     nn_solver = 'lbfgs'
