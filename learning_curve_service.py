@@ -14,6 +14,8 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     train_sizes, train_scores, test_scores = learning_curve(
         estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes)
 
+    print(train_scores)
+
     train_errors = 1 - train_scores
     test_errors = 1 - test_scores
 

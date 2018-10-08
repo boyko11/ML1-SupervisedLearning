@@ -13,23 +13,25 @@ class Learner:
 
         start_prediction_time = time.time()
         prediction = learned_model.predict(x_test)
+        predict_time = time.time() - start_prediction_time
+
         overall_accuracy_score = accuracy_score(y_test, prediction)
-        predicion_time = time.time() - start_prediction_time
 
         print('prediction: ', prediction[:20] )
         print('actual    : ', y_test[:20])
-        print('overall_accuracy_score, learning_time, prediction_time: ', overall_accuracy_score, learning_time, predicion_time)
+        print('overall_accuracy_score, learning_time, prediction_time: ', overall_accuracy_score, learning_time, predict_time)
         print('-----------------------------------------------')
 
         distinct_test_classes = np.unique(y_test)
+        print("Class, Accuracy, Train Instances, Test Instances:");
         for class_label in np.nditer(distinct_test_classes):
             class_indices = np.where(y_test == class_label)
             predictions_for_this_class = learned_model.predict(x_test[class_indices])
             number_training_instances = x_train[np.where(y_train == class_label)].shape[0]
             number_testing_instances = predictions_for_this_class.shape[0]
-            print("Accuracy score for class {0}: {1:.2f}. Number of train, test instances: {2}, {3}".format(class_label,
+            print("{0},{1:.2f},{2},{3}".format(class_label,
                                                              accuracy_score(y_test[class_indices], predictions_for_this_class), number_training_instances, number_testing_instances))
 
         print('-----------------------------------------------')
 
-        return overall_accuracy_score, learning_time, predicion_time
+        return overall_accuracy_score, learning_time, predict_time

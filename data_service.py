@@ -2,14 +2,14 @@ from sklearn import datasets,  model_selection, preprocessing
 import numpy as np
 
 
-def load_and_split_data(scale_data=False, test_size=0.5, random_slice=None, random_seed=None, dataset='breast_cancer'):
+def load_and_split_data(scale_data=False, transform_data=False, test_size=0.5, random_slice=None, random_seed=None, dataset='breast_cancer'):
 
-    X, Y = load_data(scale_data=scale_data, random_slice=random_slice, random_seed=random_seed, dataset=dataset)
+    X, Y = load_data(scale_data=scale_data, transform_data=transform_data, random_slice=random_slice, random_seed=random_seed, dataset=dataset)
     X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X, Y, test_size=test_size)
     return X_train, X_test, Y_train, Y_test
 
 
-def load_data(scale_data=False, random_slice=None, random_seed=None, dataset='breast_cancer'):
+def load_data(scale_data=False, transform_data=False, random_slice=None, random_seed=None, dataset='breast_cancer'):
 
     if random_seed is not None:
         np.random.seed(random_seed)
@@ -39,23 +39,31 @@ def load_data(scale_data=False, random_slice=None, random_seed=None, dataset='br
         X = X[random_indices, :]
         Y = Y[random_indices]
 
-    if scale_data:
-
-        for i in range(X.shape[1]):
+    if transform_data:
+        for i in [1, 2, 3]:
+            print(X[0, i])
             le = preprocessing.LabelEncoder()
             le.fit(X[:, i])
             X[:, i] = le.transform(X[:, i])
-
-        X = preprocessing.scale(X)
-
+            print('Min-Max {0}: {1}-{2}'.format(i, np.min(X[:, i]), np.max(X[:, i])))
         le = preprocessing.LabelEncoder()
         le.fit(Y)
         Y = le.transform(Y)
-        print('Transformed and Scaled:')
-        print(X[1:5, :10])
-        print('-----------------------------------------------')
-        print(Y[1:5])
-        print('-----------------------------------------------')
+
+    # print(np.amin(X, axis=0))
+    # print(np.amax(X, axis=0))
+    print(np.var(X, axis=0))
+    print('1-----------------------------------------------')
+    if scale_data:
+        X = preprocessing.scale(X)
+        #X = preprocessing.MinMaxScaler().fit_transform(X)
+        # for i in range(X.shape[1]):
+        #     print('Min-Max {0}: {1}-{2}'.format(i, np.min(X[:, i]), np.max(X[:, i])))
+
+        # print(np.amin(X, axis=0))
+        # print(np.amax(X, axis=0))
+        print(np.var(X, axis=0))
+        print('2-----------------------------------------------')
 
     shuffled_indices = np.random.choice(Y.shape[0], Y.shape[0], replace=False)
 

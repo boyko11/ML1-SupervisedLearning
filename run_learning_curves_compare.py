@@ -14,33 +14,38 @@ dt_learnerOnevsRest = OneVsRestClassifier(dt_learner.estimator)
 
 svm_learner = SVMLearner()
 
-nn_learner = NNLearner()
+nn_hidden_layer_sizes = (100,)
+nn_solver = 'lbfgs'
+nn_activation = 'relu'
+alpha = 0.0001 #regularization term coefficient
+nn_learning_rate = 'constant'
+nn_learning_rate_init = 0.0001
+nn_learner = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=200, solver=nn_solver, activation=nn_activation,
+                       alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
 
-knn_learner = KNNLearner(n_neighbors=5, weights='distance')
+n_neighbors = 5
+weights = 'distance'
+algorithm = 'auto'
+n_jobs = 5
+knn_learner = KNNLearner(n_neighbors=n_neighbors, weights=weights, algorithm=algorithm, n_jobs=n_jobs)
 
-boosting_learner = BoostingLearner()
+class_weight='balanced'
+max_depth_boost = 10
+n_estimators=50
+boosting_learner = BoostingLearner(n_estimators=n_estimators, max_depth=max_depth_boost, class_weight=class_weight)
 
-scale_data = False
+scale_data = True
+transform_data = True
 random_slice = None
 random_seed=None
-title = 'Breast Cancer Boosting Learning Curve'
-X, Y = data_service.load_data(random_seed=random_seed, dataset='kdd', scale_data=scale_data, random_slice=random_slice)
+dataset = 'breast_cancer'
+title = 'NN Breast Cancer Learning Curve'
+X, Y = data_service.load_data(random_seed=random_seed, dataset=dataset, scale_data=scale_data, transform_data=transform_data, random_slice=random_slice)
 
-ylim = (0.0, 0.65)
-ylim = (0.0, 0.03)
+ylim = (0.0, 0.08)
 train_sizes = np.linspace(.1, 1.0, 10)
 
-plot_learning_curve(estimator=dt_learnerOnevsRest, title=title, X=X, y=Y, ylim=ylim,
+estimator_to_use = knn_learner.estimator
+plot_learning_curve(estimator=estimator_to_use, title=title, X=X, y=Y, ylim=ylim,
                     train_sizes=train_sizes)
 
-# plot_learning_curve(estimator=svm_learner.estimator, title='SVM Learning Curve', X=X, y=Y, ylim=ylim,
-#                     train_sizes=train_sizes)
-#
-# plot_learning_curve(estimator=nn_learner.estimator, title='NN Learning Curve', X=X, y=Y, ylim=ylim,
-#                     train_sizes=train_sizes)
-#
-# plot_learning_curve(estimator=knn_learner.estimator, title='KNN Learning Curve', X=X, y=Y, ylim=ylim,
-#                     train_sizes=train_sizes)
-#
-# plot_learning_curve(estimator=boosting_learner.estimator, title='Boosting Learning Curve', X=X, y=Y,
-#                     ylim=ylim, train_sizes=train_sizes)

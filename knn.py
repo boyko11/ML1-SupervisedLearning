@@ -4,11 +4,9 @@ from learner import Learner
 
 class KNNLearner(Learner):
 
-    def __init__(self, n_neighbors, weights='distance'):
+    def __init__(self, n_neighbors, weights='uniform', algorithm='auto', n_jobs=1):
 
-        self.n_neighbors = n_neighbors
-        self.weights = weights
-        self.estimator = neighbors.KNeighborsClassifier(n_neighbors=self.n_neighbors, weights=self.weights)
+        self.estimator = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, algorithm=algorithm, n_jobs=n_jobs)
 
     def fit_predict_score(self, x_train, y_train, x_test, y_test):
 
