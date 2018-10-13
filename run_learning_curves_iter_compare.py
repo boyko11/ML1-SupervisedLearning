@@ -41,14 +41,15 @@ def plot_iter_learning_curve(title, num_iter_list, train_accuracy_scores, test_a
     plt.show()
 
 
-max_number_iter = 311
-iter_step = 5
-ylim = (0.0, 0.3)
-random_seed = 777
+max_number_iter = 201
+iter_step = 2
+ylim = (0.0, 0.06)
+random_seed = 889765
 dataset = 'kdd'
 transform_data = True
 random_slice = 10000
-test_size = 0.5
+train_sizes=np.array([.5])
+title='SVM KDD Iterations Learning Curve'
 
 #try scaling vs not scaling, different train/test splits?
 X, Y = data_service.load_data(scale_data=False, random_seed=random_seed, transform_data=transform_data,
@@ -56,47 +57,61 @@ X, Y = data_service.load_data(scale_data=False, random_seed=random_seed, transfo
 X_scaled, Y_scaled = data_service.load_data(scale_data=True, random_seed=random_seed,transform_data=transform_data,
                                             dataset=dataset, random_slice=random_slice)
 num_iter_list = []
-nn_train_accuracy_scores, nn_train_accuracy_scores_scaled, svm_train_accuracy_scores = [], [], []
-nn_test_accuracy_scores, nn_test_accuracy_scores_scaled, svm_test_accuracy_scores = [], [], []
+nn_train_accuracy_scores, nn_train_accuracy_scores_scaled, svm_train_accuracy_scores, svm_train_accuracy_scores_scaled = [], [], [], []
+nn_test_accuracy_scores, nn_test_accuracy_scores_scaled, svm_test_accuracy_scores, svm_test_accuracy_scores_scaled = [], [], [], []
 
 for i in range(1, max_number_iter, iter_step):
 
     print(i)
-    # svm_learner = SVMLearner(max_iter=i)
+    #
+    # nn_hidden_layer_sizes = (100,)
+    # nn_solver = 'lbfgs'
+    # nn_activation = 'relu'
+    # alpha = 0.0001  # regularization term coefficient
+    # nn_learning_rate = 'constant'
+    # nn_learning_rate_init = 0.0001
+    # nn_learner = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
+    #                        activation=nn_activation,
+    #                        alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
+    # train_sizes, nn_train_scores, nn_test_scores = learning_curve(
+    #     nn_learner.estimator, X, Y, train_sizes=np.array([1 - test_size]))
 
-    nn_hidden_layer_sizes = (100,)
-    nn_solver = 'lbfgs'
-    nn_activation = 'relu'
-    alpha = 0.0001  # regularization term coefficient
-    nn_learning_rate = 'constant'
-    nn_learning_rate_init = 0.0001
-    nn_learner = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
-                           activation=nn_activation,
-                           alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
+    # nn_learner_scaled = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
+    #                        activation=nn_activation,
+    #                        alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
 
-    train_sizes, nn_train_scores, nn_test_scores = learning_curve(
-        nn_learner.estimator, X, Y, train_sizes=np.array([1 - test_size]))
+    # train_sizes_scaled, nn_train_scores_scaled, nn_test_scores_scaled = learning_curve(
+    #     nn_learner_scaled.estimator, X_scaled, Y_scaled, train_sizes=np.array([1 - test_size]))
 
-    nn_learner_scaled = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
-                           activation=nn_activation,
-                           alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
+    # nn_test_accuracy_scores.append(np.mean(nn_test_scores))
+    # nn_train_accuracy_scores.append(np.mean(nn_train_scores))
+    # nn_test_accuracy_scores_scaled.append(np.mean(nn_test_scores_scaled))
+    # nn_train_accuracy_scores_scaled.append(np.mean(nn_train_scores_scaled))
 
-    train_sizes_scaled, nn_train_scores_scaled, nn_test_scores_scaled = learning_curve(
-        nn_learner_scaled.estimator, X_scaled, Y_scaled, train_sizes=np.array([1 - test_size]))
+    kernel = 'linear'  # ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’,
+    C = 1.0
+    gamma = 'auto'
+    verbose = False
+    svm_learner = SVMLearner(kernel=kernel, C=C, max_iter=i)
 
-    # train_sizes, svm_train_scores, svm_test_scores = learning_curve(
-    #     svm_learner.estimator, X, Y, train_sizes=np.array([.9]))
+    train_sizes, svm_train_scores, svm_test_scores = learning_curve(
+        svm_learner.estimator, X, Y, train_sizes=train_sizes)
+
+
+    svm_learner_scaled = SVMLearner(kernel=kernel, C=C, max_iter=i)
+
+    train_sizes_scaled, svm_train_scores_scaled, svm_test_scores_scaled = learning_curve(
+        svm_learner_scaled.estimator, X_scaled, Y_scaled, train_sizes=train_sizes)
+
+    svm_test_accuracy_scores.append(np.mean(svm_test_scores))
+    svm_train_accuracy_scores.append(np.mean(svm_train_scores))
+    svm_test_accuracy_scores_scaled.append(np.mean(svm_test_scores_scaled))
+    svm_train_accuracy_scores_scaled.append(np.mean(svm_train_scores_scaled))
 
     num_iter_list.append(i)
-    nn_test_accuracy_scores.append(np.mean(nn_test_scores))
-    nn_train_accuracy_scores.append(np.mean(nn_train_scores))
-    nn_test_accuracy_scores_scaled.append(np.mean(nn_test_scores_scaled))
-    nn_train_accuracy_scores_scaled.append(np.mean(nn_train_scores_scaled))
-    # svm_test_accuracy_scores.append(np.mean(svm_test_scores))
-    # svm_train_accuracy_scores.append(np.mean(svm_train_scores))
 
 
-plot_iter_learning_curve('NN Iterations Learning Curve', num_iter_list, nn_train_accuracy_scores,
-                         nn_test_accuracy_scores, nn_train_accuracy_scores_scaled, nn_test_accuracy_scores_scaled, ylim)
-# plot_iter_learning_curve('SVM Iterations Learning Curve', num_iter_list, svm_train_accuracy_scores,
-#                          svm_test_accuracy_scores, ylim)
+# plot_iter_learning_curve('NN Iterations Learning Curve', num_iter_list, nn_train_accuracy_scores,
+#                          nn_test_accuracy_scores, nn_train_accuracy_scores_scaled, nn_test_accuracy_scores_scaled, ylim)
+plot_iter_learning_curve(title, num_iter_list, svm_train_accuracy_scores,
+                         svm_test_accuracy_scores, svm_train_accuracy_scores_scaled, svm_test_accuracy_scores_scaled, ylim)

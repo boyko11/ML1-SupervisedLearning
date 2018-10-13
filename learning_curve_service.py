@@ -22,6 +22,9 @@ def plot_learning_curve(estimator, estimator_non_scaled, title, X, y, X_non_scal
     test_errors_mean = np.mean(test_errors, axis=1)
     test_errors_std = np.std(test_errors, axis=1)
 
+    print('train_errors_mean:')
+    print(train_errors_mean)
+
     plt.grid()
 
     plt.fill_between(train_sizes, train_errors_mean - train_errors_std,

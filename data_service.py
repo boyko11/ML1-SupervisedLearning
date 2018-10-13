@@ -50,8 +50,8 @@ def load_data(scale_data=False, transform_data=False, random_slice=None, random_
         le.fit(Y)
         Y = le.transform(Y)
 
-    # print(np.amin(X, axis=0))
-    # print(np.amax(X, axis=0))
+    print(np.amin(X, axis=0))
+    print(np.amax(X, axis=0))
     print(np.var(X, axis=0))
     print('1-----------------------------------------------')
     if scale_data:
@@ -60,8 +60,8 @@ def load_data(scale_data=False, transform_data=False, random_slice=None, random_
         # for i in range(X.shape[1]):
         #     print('Min-Max {0}: {1}-{2}'.format(i, np.min(X[:, i]), np.max(X[:, i])))
 
-        # print(np.amin(X, axis=0))
-        # print(np.amax(X, axis=0))
+        print(np.amin(X, axis=0))
+        print(np.amax(X, axis=0))
         print(np.var(X, axis=0))
         print('2-----------------------------------------------')
 
