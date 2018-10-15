@@ -31,9 +31,9 @@ def load_data(scale_data=False, transform_data=False, random_slice=None, random_
     # print('-----------------------------------------------')
     # print(Y[ten_random_records])
     # print('-----------------------------------------------')
-    print('X.shape: ', X.shape)
-    print('Y.shape: ', Y.shape)
-    print('-----------------------------------------------')
+    # print('X.shape: ', X.shape)
+    # print('Y.shape: ', Y.shape)
+    # print('-----------------------------------------------')
     if random_slice is not None:
         random_indices = np.random.choice(Y.shape[0], random_slice if random_slice < Y.shape[0] else Y.shape[0], replace=False)
         X = X[random_indices, :]
@@ -45,25 +45,25 @@ def load_data(scale_data=False, transform_data=False, random_slice=None, random_
             le = preprocessing.LabelEncoder()
             le.fit(X[:, i])
             X[:, i] = le.transform(X[:, i])
-            print('Min-Max {0}: {1}-{2}'.format(i, np.min(X[:, i]), np.max(X[:, i])))
+            #print('Min-Max {0}: {1}-{2}'.format(i, np.min(X[:, i]), np.max(X[:, i])))
         le = preprocessing.LabelEncoder()
         le.fit(Y)
         Y = le.transform(Y)
 
-    print(np.amin(X, axis=0))
-    print(np.amax(X, axis=0))
-    print(np.var(X, axis=0))
-    print('1-----------------------------------------------')
+    # print(np.amin(X, axis=0))
+    # print(np.amax(X, axis=0))
+    # print(np.var(X, axis=0))
+    # print('1-----------------------------------------------')
     if scale_data:
         X = preprocessing.scale(X)
         #X = preprocessing.MinMaxScaler().fit_transform(X)
         # for i in range(X.shape[1]):
         #     print('Min-Max {0}: {1}-{2}'.format(i, np.min(X[:, i]), np.max(X[:, i])))
 
-        print(np.amin(X, axis=0))
-        print(np.amax(X, axis=0))
-        print(np.var(X, axis=0))
-        print('2-----------------------------------------------')
+        # print(np.amin(X, axis=0))
+        # print(np.amax(X, axis=0))
+        # print(np.var(X, axis=0))
+        # print('2-----------------------------------------------')
 
     shuffled_indices = np.random.choice(Y.shape[0], Y.shape[0], replace=False)
 
