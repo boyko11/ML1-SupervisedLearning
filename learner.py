@@ -9,7 +9,16 @@ class Learner:
 
         start_learning_time = time.time()
         learned_model = learner.fit(x_train, y_train)
+        print("Printing Model: ")
+        print(dir(learned_model))
+        print("End Model")
         learning_time = time.time() - start_learning_time
+        print('learning_time: ', learning_time)
+        overall_accuracy_score, predict_time = self.predict_score(learned_model, x_train, y_train, x_test, y_test)
+        return overall_accuracy_score, learning_time, predict_time
+
+
+    def predict_score(self, learned_model, x_train, y_train, x_test, y_test):
 
         start_prediction_time = time.time()
         prediction = learned_model.predict(x_test)
@@ -19,7 +28,7 @@ class Learner:
 
         print('prediction: ', prediction[:20] )
         print('actual    : ', y_test[:20])
-        print('overall_accuracy_score, learning_time, prediction_time: ', overall_accuracy_score, learning_time, predict_time)
+        print('overall_accuracy_score, prediction_time: ', overall_accuracy_score, predict_time)
         print('-----------------------------------------------')
 
         distinct_test_classes = np.unique(y_test)
@@ -34,4 +43,4 @@ class Learner:
 
         print('-----------------------------------------------')
 
-        return overall_accuracy_score, learning_time, predict_time
+        return overall_accuracy_score, predict_time
