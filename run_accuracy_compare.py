@@ -1,11 +1,3 @@
-# dt: 0.9434524065643745
-# knn: 0.9331428620603599
-# boost: 0.5588926275569478
-# nn: 0.8255208557438276
-
-
-
-import numpy as np
 import data_service
 import stats_service
 from decision_tree import DTLearner
@@ -13,7 +5,23 @@ from svm import SVMLearner
 from neural_network import NNLearner
 from knn import KNNLearner
 from boosting import BoostingLearner
-from sklearn.multiclass import OneVsRestClassifier
+import sys
+
+if len(sys.argv) < 2:
+    print('Need to specify a dataset, e.g. python run_accuracy_compare.py breast_cancer')
+    exit()
+
+dataset = sys.argv[1]
+
+scale_data = True
+transform_data = False
+random_slice = None
+random_seed=None
+
+if dataset == 'kdd':
+    transform_data = True
+    random_slice = 10000
+    random_seed = None
 
 dt_accuracy_scores, svm_accuracy_scores, nn_accuracy_scores, knn_accuracy_scores, boosting_accuracy_scores = [], [], [], [], []
 dt_fit_times, svm_fit_times, nn_fit_times, knn_fit_times, boosting_fit_times = [], [], [], [], []
@@ -31,7 +39,7 @@ dt_learner = DTLearner(criterion=criterion, min_samples_leaf=min_samples_leaf, m
 
 ##  Boost #############################
 class_weight='balanced'
-max_depth_boost = 10
+max_depth_boost = None
 n_estimators=50
 boosting_learner = BoostingLearner(n_estimators=n_estimators, max_depth=max_depth_boost, class_weight=class_weight)
 
@@ -48,12 +56,12 @@ knn_learner = KNNLearner(n_neighbors=n_neighbors, weights=weights, algorithm=alg
 # nn_activation = 'relu'
 # alpha = 0.0001 #regularization term coefficient
 # nn_learning_rate = 'constant'
-# nn_learning_rate_init = 0.0001
+nn_learning_rate_init = 0.0001
 nn_activation = 'relu'
 alpha = 0.0001
 nn_hidden_layer_sizes = (100,)
 nn_learning_rate = 'constant'
-nn_learning_rate_init = 0.01
+#nn_learning_rate_init = 0.01
 nn_solver = 'lbfgs'
 
 #{'activation': 'relu', 'alpha': 0.0001, 'hidden_layer_sizes': (100,), 'learning_rate_init': 0.01, 'solver': 'lbfgs'}
@@ -83,13 +91,7 @@ svm_learner = SVMLearner(kernel=kernel, C=C, max_iter=max_iter, degree=poly_degr
 #svm_learner = SVMLearner(kernel=kernel, C=C, gamma=gamma, max_iter=max_iter, verbose=verbose)
 
 num_runs = 1
-scale_data = True
-transform_data = True
-random_slice = None
-random_seed = 777
-
-dataset = 'kdd'
-test_size = 0.5
+test_size = 0.1
 
 for i in range(num_runs):
     x_train, x_test, y_train, y_test = data_service.load_and_split_data(scale_data=scale_data, transform_data=transform_data,
@@ -100,32 +102,32 @@ for i in range(num_runs):
     x_test_copy1, x_test_copy2, x_test_copy3, x_test_copy4 = x_test.copy(), x_test.copy(), x_test.copy(), x_test.copy()
     y_test_copy1, y_test_copy2, y_test_copy3, y_test_copy4 = y_test.copy(), y_test.copy(), y_test.copy(), y_test.copy()
 
-    # dt_accuracy_score, dt_fit_time, dt_predict_time = dt_learner.fit_predict_score(x_train, y_train, x_test, y_test)
-    # print('dt {3}: {0}, {1}, {2}'.format(dt_accuracy_score, dt_fit_time, dt_predict_time, i))
-    # stats_service.record_stats(dt_accuracy_scores, dt_accuracy_score, dt_fit_times, dt_fit_time, dt_predict_times,
-    #                            dt_predict_time)
-    # dt_learner.draw_tree(tree_id=i)
-    #
-    # knn_accuracy_score, knn_fit_time, knn_predict_time = knn_learner.fit_predict_score(x_train_copy1, y_train_copy1, x_test_copy1, y_test_copy1)
-    # print('knn: {0}, {1}, {2}'.format(knn_accuracy_score, knn_fit_time, knn_predict_time))
-    # stats_service.record_stats(knn_accuracy_scores, knn_accuracy_score, knn_fit_times, knn_fit_time, knn_predict_times,
-    #                            knn_predict_time)
-    #
-    #
-    # boosting_accuracy_score, boosting_fit_time, boosting_predict_time = boosting_learner.fit_predict_score(x_train_copy2, y_train_copy2, x_test_copy2, y_test_copy2)
-    # print('boost {3}: {0}, {1}, {2}'.format(boosting_accuracy_score, boosting_fit_time, boosting_predict_time, i))
-    # stats_service.record_stats(boosting_accuracy_scores, boosting_accuracy_score, boosting_fit_times, boosting_fit_time,
-    #                            boosting_predict_times, boosting_predict_time)
-    #
+    dt_accuracy_score, dt_fit_time, dt_predict_time = dt_learner.fit_predict_score(x_train, y_train, x_test, y_test)
+    print('dt {3}: {0}, {1}, {2}'.format(dt_accuracy_score, dt_fit_time, dt_predict_time, i))
+    stats_service.record_stats(dt_accuracy_scores, dt_accuracy_score, dt_fit_times, dt_fit_time, dt_predict_times,
+                               dt_predict_time)
+    #dt_learner.draw_tree(tree_id=i)
+
+    knn_accuracy_score, knn_fit_time, knn_predict_time = knn_learner.fit_predict_score(x_train_copy1, y_train_copy1, x_test_copy1, y_test_copy1)
+    print('knn: {0}, {1}, {2}'.format(knn_accuracy_score, knn_fit_time, knn_predict_time))
+    stats_service.record_stats(knn_accuracy_scores, knn_accuracy_score, knn_fit_times, knn_fit_time, knn_predict_times,
+                               knn_predict_time)
+
+
+    boosting_accuracy_score, boosting_fit_time, boosting_predict_time = boosting_learner.fit_predict_score(x_train_copy2, y_train_copy2, x_test_copy2, y_test_copy2)
+    print('boost {3}: {0}, {1}, {2}'.format(boosting_accuracy_score, boosting_fit_time, boosting_predict_time, i))
+    stats_service.record_stats(boosting_accuracy_scores, boosting_accuracy_score, boosting_fit_times, boosting_fit_time,
+                               boosting_predict_times, boosting_predict_time)
+
     nn_accuracy_score, nn_fit_time, nn_predict_time = nn_learner.fit_predict_score(x_train_copy3, y_train_copy3, x_test_copy3, y_test_copy3)
     print('nn: {0}, {1}, {2}'.format(nn_accuracy_score, nn_fit_time, nn_predict_time))
     stats_service.record_stats(nn_accuracy_scores, nn_accuracy_score, nn_fit_times, nn_fit_time, nn_predict_times,
                                nn_predict_time)
 
-    # svm_accuracy_score, svm_fit_time, svm_predict_time = svm_learner.fit_predict_score(x_train_copy4, y_train_copy4, x_test_copy4, y_test_copy4)
-    # print('svm: {0}, {1}, {2}'.format(svm_accuracy_score, svm_fit_time, svm_predict_time))
-    # stats_service.record_stats(svm_accuracy_scores, svm_accuracy_score, svm_fit_times, svm_fit_time, svm_predict_times,
-    #                            svm_predict_time)
+    svm_accuracy_score, svm_fit_time, svm_predict_time = svm_learner.fit_predict_score(x_train_copy4, y_train_copy4, x_test_copy4, y_test_copy4)
+    print('svm: {0}, {1}, {2}'.format(svm_accuracy_score, svm_fit_time, svm_predict_time))
+    stats_service.record_stats(svm_accuracy_scores, svm_accuracy_score, svm_fit_times, svm_fit_time, svm_predict_times,
+                               svm_predict_time)
 
 
 

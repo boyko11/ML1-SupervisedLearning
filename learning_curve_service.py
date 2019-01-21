@@ -53,4 +53,5 @@ def plot_learning_curve(estimator, estimator_non_scaled, title, X, y, X_non_scal
                  label="Test error Non-Scaled")
 
     plt.legend(loc="best")
-    plt.show()
+    #plt.show()
+    plt.savefig('{0}.png'.format('_'.join(title.split())))

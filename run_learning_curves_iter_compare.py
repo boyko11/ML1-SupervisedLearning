@@ -4,6 +4,7 @@ from svm import SVMLearner
 from neural_network import NNLearner
 import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve
+import sys
 
 
 def plot_iter_learning_curve(title, num_iter_list, train_accuracy_scores, test_accuracy_scores,
@@ -38,18 +39,35 @@ def plot_iter_learning_curve(title, num_iter_list, train_accuracy_scores, test_a
     plt.plot(num_iter_nparray, test_errors, color="g", label="Test error Non-Scaled", linestyle='dashed')
 
     plt.legend(loc="best")
-    plt.show()
+    # plt.show()
+    plt.savefig('{0}.png'.format('_'.join(title.split())))
+
+
+if len(sys.argv) < 3:
+    print('Need to specify algorithm and dataset, e.g. python run_learning_curves_iter_compare.py nn breast_cancer')
+    exit()
+
+algo = sys.argv[1]
+dataset = sys.argv[2]
+
+scale_data = True
+transform_data = False
+random_slice = None
+random_seed=None
+title = 'Breast Cancer {0} Iterations Learning Curve'.format(algo.upper())
+ylim = (0.0, 0.10)
+
+if dataset == 'kdd':
+    transform_data = True
+    random_slice = 1000
+    random_seed = None
+    title = 'KDD {0} Iterations Learning Curve'.format(algo.upper())
+    ylim = (0.0, 0.15)
 
 
 max_number_iter = 201
 iter_step = 2
-ylim = (0.0, 0.06)
-random_seed = 889765
-dataset = 'kdd'
-transform_data = True
-random_slice = 10000
 train_sizes=np.array([.5])
-title='SVM KDD Iterations Learning Curve'
 
 #try scaling vs not scaling, different train/test splits?
 X, Y = data_service.load_data(scale_data=False, random_seed=random_seed, transform_data=transform_data,
@@ -63,55 +81,58 @@ nn_test_accuracy_scores, nn_test_accuracy_scores_scaled, svm_test_accuracy_score
 for i in range(1, max_number_iter, iter_step):
 
     print(i)
-    #
-    # nn_hidden_layer_sizes = (100,)
-    # nn_solver = 'lbfgs'
-    # nn_activation = 'relu'
-    # alpha = 0.0001  # regularization term coefficient
-    # nn_learning_rate = 'constant'
-    # nn_learning_rate_init = 0.0001
-    # nn_learner = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
-    #                        activation=nn_activation,
-    #                        alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
-    # train_sizes, nn_train_scores, nn_test_scores = learning_curve(
-    #     nn_learner.estimator, X, Y, train_sizes=np.array([1 - test_size]))
+    if algo == 'nn':
+        nn_hidden_layer_sizes = (100,)
+        nn_solver = 'lbfgs'
+        nn_activation = 'relu'
+        alpha = 0.0001  # regularization term coefficient
+        nn_learning_rate = 'constant'
+        nn_learning_rate_init = 0.0001
+        nn_learner = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
+                               activation=nn_activation,
+                               alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
+        train_sizes, nn_train_scores, nn_test_scores = learning_curve(
+            nn_learner.estimator, X, Y, train_sizes=train_sizes)
 
-    # nn_learner_scaled = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
-    #                        activation=nn_activation,
-    #                        alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
+        nn_learner_scaled = NNLearner(hidden_layer_sizes=nn_hidden_layer_sizes, max_iter=i, solver=nn_solver,
+                               activation=nn_activation,
+                               alpha=alpha, learning_rate=nn_learning_rate, learning_rate_init=nn_learning_rate_init)
 
-    # train_sizes_scaled, nn_train_scores_scaled, nn_test_scores_scaled = learning_curve(
-    #     nn_learner_scaled.estimator, X_scaled, Y_scaled, train_sizes=np.array([1 - test_size]))
+        train_sizes_scaled, nn_train_scores_scaled, nn_test_scores_scaled = learning_curve(
+            nn_learner_scaled.estimator, X_scaled, Y_scaled, train_sizes=train_sizes)
 
-    # nn_test_accuracy_scores.append(np.mean(nn_test_scores))
-    # nn_train_accuracy_scores.append(np.mean(nn_train_scores))
-    # nn_test_accuracy_scores_scaled.append(np.mean(nn_test_scores_scaled))
-    # nn_train_accuracy_scores_scaled.append(np.mean(nn_train_scores_scaled))
+        nn_test_accuracy_scores.append(np.mean(nn_test_scores))
+        nn_train_accuracy_scores.append(np.mean(nn_train_scores))
+        nn_test_accuracy_scores_scaled.append(np.mean(nn_test_scores_scaled))
+        nn_train_accuracy_scores_scaled.append(np.mean(nn_train_scores_scaled))
 
-    kernel = 'linear'  # ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’,
-    C = 1.0
-    gamma = 'auto'
-    verbose = False
-    svm_learner = SVMLearner(kernel=kernel, C=C, max_iter=i)
+    if algo == 'svm':
+        kernel = 'linear'  # ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’,
+        # C = 10.0
+        # gamma = 0.001
+        verbose = False
+        svm_learner = SVMLearner(kernel=kernel, max_iter=i, class_weight='balanced')
 
-    train_sizes, svm_train_scores, svm_test_scores = learning_curve(
-        svm_learner.estimator, X, Y, train_sizes=train_sizes)
+        train_sizes, svm_train_scores, svm_test_scores = learning_curve(
+            svm_learner.estimator, X, Y, train_sizes=train_sizes)
 
 
-    svm_learner_scaled = SVMLearner(kernel=kernel, C=C, max_iter=i)
+        svm_learner_scaled = SVMLearner(kernel=kernel, max_iter=i, class_weight='balanced')
 
-    train_sizes_scaled, svm_train_scores_scaled, svm_test_scores_scaled = learning_curve(
-        svm_learner_scaled.estimator, X_scaled, Y_scaled, train_sizes=train_sizes)
+        train_sizes_scaled, svm_train_scores_scaled, svm_test_scores_scaled = learning_curve(
+            svm_learner_scaled.estimator, X_scaled, Y_scaled, train_sizes=train_sizes)
 
-    svm_test_accuracy_scores.append(np.mean(svm_test_scores))
-    svm_train_accuracy_scores.append(np.mean(svm_train_scores))
-    svm_test_accuracy_scores_scaled.append(np.mean(svm_test_scores_scaled))
-    svm_train_accuracy_scores_scaled.append(np.mean(svm_train_scores_scaled))
+        svm_test_accuracy_scores.append(np.mean(svm_test_scores))
+        svm_train_accuracy_scores.append(np.mean(svm_train_scores))
+        svm_test_accuracy_scores_scaled.append(np.mean(svm_test_scores_scaled))
+        svm_train_accuracy_scores_scaled.append(np.mean(svm_train_scores_scaled))
 
     num_iter_list.append(i)
 
+if algo == 'nn':
+    plot_iter_learning_curve(title, num_iter_list, nn_train_accuracy_scores,
+                         nn_test_accuracy_scores, nn_train_accuracy_scores_scaled, nn_test_accuracy_scores_scaled, ylim)
 
-# plot_iter_learning_curve('NN Iterations Learning Curve', num_iter_list, nn_train_accuracy_scores,
-#                          nn_test_accuracy_scores, nn_train_accuracy_scores_scaled, nn_test_accuracy_scores_scaled, ylim)
-plot_iter_learning_curve(title, num_iter_list, svm_train_accuracy_scores,
+if algo == 'svm':
+    plot_iter_learning_curve(title, num_iter_list, svm_train_accuracy_scores,
                          svm_test_accuracy_scores, svm_train_accuracy_scores_scaled, svm_test_accuracy_scores_scaled, ylim)

@@ -41,7 +41,7 @@ def load_data(scale_data=False, transform_data=False, random_slice=None, random_
 
     if transform_data:
         for i in [1, 2, 3]:
-            print(X[0, i])
+            # print(X[0, i])
             le = preprocessing.LabelEncoder()
             le.fit(X[:, i])
             X[:, i] = le.transform(X[:, i])
